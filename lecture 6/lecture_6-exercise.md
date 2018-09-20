@@ -173,21 +173,44 @@ Let's make *box plots* of population for each continent. Note: y-axis is much be
 
 1.  Fill out the grammar components below. Again, bold *must* be specified to make a `ggplot2` plot.
 
-| Grammar Component     | Specification |
-|-----------------------|---------------|
-| **data**              | `gapminder`   |
-| **aesthetic mapping** |               |
-| **geometric object**  |               |
-| scale                 |               |
-| statistical transform |               |
+| Grammar Component     | Specification    |
+|-----------------------|------------------|
+| **data**              | `gapminder`      |
+| **aesthetic mapping** | `x` and `y`      |
+| **geometric object**  | boxplot          |
+| scale                 | log              |
+| statistical transform | 5-number summary |
 
 1.  Initiate the `ggplot` call, with the log y scale, and store it in the variable `a`. Print out `a`.
 
-2.  Add the boxplot geom to `a`.
+``` r
+a <- ggplot(gapminder, aes(continent, pop)) + 
+  scale_y_log10()
 
-3.  A violin plot is a kernel density on its side, made symmetric. Add that geom to `a`.
+a
+```
+
+![](lecture_6-exercise_files/figure-markdown_github/unnamed-chunk-11-1.png)
+
+1.  Add the boxplot geom to `a`.
+
+``` r
+a + geom_boxplot()
+```
+
+![](lecture_6-exercise_files/figure-markdown_github/unnamed-chunk-12-1.png)
+
+1.  A violin plot is a kernel density on its side, made symmetric. Add that geom to `a`.
     -   What's better here, boxplots or violin plots? Why?
-4.  Optional: git stage and commit
+    -   more information
+
+``` r
+a + geom_violin()
+```
+
+![](lecture_6-exercise_files/figure-markdown_github/unnamed-chunk-13-1.png)
+
+1.  Optional: git stage and commit
 
 **Use of boxplot**: Visualize 1-dimensional distributions (of a single numeric variable).
 
