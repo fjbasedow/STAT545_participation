@@ -202,7 +202,7 @@ a + geom_boxplot()
 
 1.  A violin plot is a kernel density on its side, made symmetric. Add that geom to `a`.
     -   What's better here, boxplots or violin plots? Why?
-    -   more information
+        -   more information
 
 ``` r
 a + geom_violin()
@@ -223,15 +223,34 @@ Let's hold off on identifying the grammar.
 
 1.  Initiate the `ggplot` call to make a scatterplot of `continent` vs `pop`; initiate the log y scale. Store the call in the variable `b`.
 
-2.  Add the point geom to `b`. Why is this an ineffective plot?
+``` r
+a + geom_point(alpha=0.1) # alpha transparency
+```
 
-3.  A solution is to jitter the points. Add the jitter geom. Re-run the command a few times -- does the plot change? Why?
+![](lecture_6-exercise_files/figure-markdown_github/unnamed-chunk-14-1.png)
 
-4.  How does the grammar differ from a box plot or violin plot?
-    -   ANSWER:
-5.  We can add multiple geom *layers* to our plot. Put a jitterplot overtop of the violin plot, starting with our base `b`. Try vice-versa.
+1.  Add the point geom to `b`. Why is this an ineffective plot?
 
-6.  Optional: git stage and commit
+2.  A solution is to jitter the points. Add the jitter geom. Re-run the command a few times -- does the plot change? Why?
+
+``` r
+a + geom_jitter(alpha=0.25)
+```
+
+![](lecture_6-exercise_files/figure-markdown_github/unnamed-chunk-15-1.png)
+
+1.  How does the grammar differ from a box plot or violin plot?
+    -   ANSWER: you get to see how many points there are in the violin plot
+2.  We can add multiple geom *layers* to our plot. Put a jitterplot overtop of the violin plot, starting with our base `b`. Try vice-versa.
+
+``` r
+a + geom_violin() +
+  geom_jitter(alpha=0.1)
+```
+
+![](lecture_6-exercise_files/figure-markdown_github/unnamed-chunk-16-1.png)
+
+1.  Optional: git stage and commit
 
 **Uses of jitterplot**: Visualize 1-dimensional distributions, AND get a sense of the sample size.
 
