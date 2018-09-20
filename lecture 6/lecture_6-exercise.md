@@ -274,11 +274,35 @@ Let's make some time/line plot, starting with Canada's life expectancy over time
     2.  Pipes the filtered data into `ggplot`
     3.  Makes the time plot of `lifeExp` over time
     4.  Also displays the points
-2.  Attempt to overlay line plots for all countries. That is, repeat the above code, but don't filter. What's wrong here?
 
-3.  Use the `group` aesthetic to fix the problem.
+``` r
+gapminder %>% 
+  filter(country == "Canada") %>%
+  ggplot(aes(year, lifeExp)) + 
+  geom_line() +
+  geom_point()
+```
 
-4.  Optional: git stage and commit
+![](lecture_6-exercise_files/figure-markdown_github/unnamed-chunk-17-1.png)
+
+1.  Attempt to overlay line plots for all countries. That is, repeat the above code, but don't filter. What's wrong here?
+
+``` r
+c <- ggplot(gapminder, aes(year, lifeExp))
+c + geom_line()
+```
+
+![](lecture_6-exercise_files/figure-markdown_github/unnamed-chunk-18-1.png)
+
+1.  Use the `group` aesthetic to fix the problem.
+
+``` r
+c + geom_line(aes(group=country), alpha=0.2) 
+```
+
+![](lecture_6-exercise_files/figure-markdown_github/unnamed-chunk-19-1.png)
+
+1.  Optional: git stage and commit
 
 **Uses of time/line plots**: Visualize trends of a numeric variable over time.
 
