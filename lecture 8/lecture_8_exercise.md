@@ -493,4 +493,27 @@ Practice these concepts in the following exercises. It might help you to first i
 
 2.  Compute the change in population from 1962 to 1972 for each country.
 
-3.  Rank the continents by GDP per capita. You should have two columns: one with continent, and another with the ranking (1 through 5). **Hint**: use the `rank()` or `min_rank()` function.
+``` r
+gapminder %>% 
+  group_by(country) %>% 
+  mutate(change = pop[year ==1972] -pop[year ==1962]) %>% 
+  filter(year == 1962 & 1972)
+```
+
+    ## # A tibble: 142 x 7
+    ## # Groups:   country [142]
+    ##    country     continent  year lifeExp      pop gdpPercap   change
+    ##    <fct>       <fct>     <int>   <dbl>    <int>     <dbl>    <int>
+    ##  1 Afghanistan Asia       1962    32.0 10267083      853.  2812377
+    ##  2 Albania     Europe     1962    64.8  1728137     2313.   535417
+    ##  3 Algeria     Africa     1962    48.3 11000948     2551.  3759839
+    ##  4 Angola      Africa     1962    34.0  4826015     4269.  1068843
+    ##  5 Argentina   Americas   1962    65.1 21283783     7133.  3496016
+    ##  6 Australia   Oceania    1962    70.9 10794968    12217.  2382032
+    ##  7 Austria     Europe     1962    69.5  7129864    10751.   414337
+    ##  8 Bahrain     Asia       1962    56.9   171863    12753.    58937
+    ##  9 Bangladesh  Asia       1962    41.2 56839289      686. 13920006
+    ## 10 Belgium     Europe     1962    70.2  9218400    10991.   490700
+    ## # ... with 132 more rows
+
+1.  Rank the continents by GDP per capita. You should have two columns: one with continent, and another with the ranking (1 through 5). **Hint**: use the `rank()` or `min_rank()` function.

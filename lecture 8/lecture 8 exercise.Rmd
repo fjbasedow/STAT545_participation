@@ -249,4 +249,15 @@ Practice these concepts in the following exercises. It might help you to first i
 
 2. Compute the change in population from 1962 to 1972 for each country.
 
+```{r}
+gapminder %>% 
+  group_by(country) %>% 
+  mutate(change = pop[year ==1972] -pop[year ==1962]) %>% 
+  filter(year == 1962 & 1972)
+```
+
+
 3. Rank the continents by GDP per capita. You should have two columns: one with continent, and another with the ranking (1 through 5). __Hint__: use the `rank()` or `min_rank()` function.
+
+
+
