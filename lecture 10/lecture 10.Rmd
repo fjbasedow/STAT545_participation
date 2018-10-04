@@ -173,14 +173,24 @@ semi_join(a, c) # prints only row that has a match
 
 ### example for `intersect`: Rows that appear in both `y` and `z`
 
+```{r}
+intersect(y,z) #prints rows that intersect between two data sets
+```
 
 
 ### example for `union`: Rows that appear in either or both `y` and `z`
 
+```{r}
+union(y,z)
+```
 
 
 ### example for `setdiff`: Rows that appear in `y` but not `z`. __Caution:__ `setdiff` for `y` to `z` and `z` to `y` are different.
 
+```{r}
+setdiff(y,z) #row that is absent in z
+setdiff(z,y) # row that is absent in y
+```
 
 
 ### what happen if colnames are differentin `y` and `x`? Is there any error message and why?
@@ -188,6 +198,7 @@ semi_join(a, c) # prints only row that has a match
 ```{r}
 (x <- tibble(x1 = c("B", "C", "D"), x3 = 2:4))
 
+# intersect(z,x) doesn't work
 ```
 
 ## Types of binding datasets
@@ -196,13 +207,25 @@ semi_join(a, c) # prints only row that has a match
 
 ### example for `bind_rows`: Append `z` to `y` as new rows
 
+```{r}
+bind_rows(y,z)
+```
 
 
 ### example for `bind_cols`: Append `z` to `y` as new columns. __Caution__: matches rows by position. Check colnames after binding.
 
+```{r}
+bind_cols(y,z) # adds extensions to column names because can't have same column names twice
+```
+
 
 ### what happen if colnames are different between `y` and `x` datasets?
 
+```{r}
+bind_cols(y,x)
+```
+
+colnames don't matter
 
 ##Practice Exercises
 Practice these concepts in the following exercises. It might help you to first identify the type of function you are applying.
