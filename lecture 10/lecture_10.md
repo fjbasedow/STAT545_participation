@@ -98,7 +98,24 @@ full_join(a,b, by="x1")
 
 ### what happen if we do not specify `by` option?
 
+``` r
+left_join(a,b) # automatically finds column to join by
+```
+
+    ## Joining, by = "x1"
+
+    ## # A tibble: 3 x 3
+    ##   x1       x2 x3   
+    ##   <chr> <int> <chr>
+    ## 1 A         1 T    
+    ## 2 B         2 F    
+    ## 3 C         3 <NA>
+
 ### what happen if we join two different variables (e.g., "x1" to "x3") from two tibbles `a` to `b`?
+
+``` r
+# left_join(a, b, by =c("x1", "x3")) ?
+```
 
 ### what happen if two columns of `a` and `c` datasets have the identical colnames?
 
@@ -508,6 +525,118 @@ Practice these concepts in the following exercises. It might help you to first i
 
 ### 1. Filter the rows of `flights2` by matching "year" and "time\_hour" variables to `weather` dataset. Use both `semi_join()` and `anti_join()`
 
+``` r
+semi_join(flights2, weather)
+```
+
+    ## Joining, by = c("year", "time_hour")
+
+    ## # A tibble: 1,000 x 4
+    ##     year tailnum carrier time_hour          
+    ##    <int> <chr>   <chr>   <dttm>             
+    ##  1  2013 N14228  UA      2013-01-01 05:00:00
+    ##  2  2013 N24211  UA      2013-01-01 05:00:00
+    ##  3  2013 N619AA  AA      2013-01-01 05:00:00
+    ##  4  2013 N804JB  B6      2013-01-01 05:00:00
+    ##  5  2013 N668DN  DL      2013-01-01 06:00:00
+    ##  6  2013 N39463  UA      2013-01-01 05:00:00
+    ##  7  2013 N516JB  B6      2013-01-01 06:00:00
+    ##  8  2013 N829AS  EV      2013-01-01 06:00:00
+    ##  9  2013 N593JB  B6      2013-01-01 06:00:00
+    ## 10  2013 N3ALAA  AA      2013-01-01 06:00:00
+    ## # ... with 990 more rows
+
+``` r
+anti_join(flights2, weather) # there is no mismatch
+```
+
+    ## Joining, by = c("year", "time_hour")
+
+    ## # A tibble: 0 x 4
+    ## # ... with 4 variables: year <int>, tailnum <chr>, carrier <chr>,
+    ## #   time_hour <dttm>
+
 ### 2. Can we apply `set` and `binding` funcions between `flights2` and `weather` datasets. Why and why not?
 
+``` r
+# union(flights2, weather) 
+
+bind_rows(flights2, weather)
+```
+
+    ## # A tibble: 27,115 x 17
+    ##     year tailnum carrier time_hour           origin month   day  hour
+    ##    <dbl> <chr>   <chr>   <dttm>              <chr>  <dbl> <int> <int>
+    ##  1 2013. N14228  UA      2013-01-01 05:00:00 <NA>      NA    NA    NA
+    ##  2 2013. N24211  UA      2013-01-01 05:00:00 <NA>      NA    NA    NA
+    ##  3 2013. N619AA  AA      2013-01-01 05:00:00 <NA>      NA    NA    NA
+    ##  4 2013. N804JB  B6      2013-01-01 05:00:00 <NA>      NA    NA    NA
+    ##  5 2013. N668DN  DL      2013-01-01 06:00:00 <NA>      NA    NA    NA
+    ##  6 2013. N39463  UA      2013-01-01 05:00:00 <NA>      NA    NA    NA
+    ##  7 2013. N516JB  B6      2013-01-01 06:00:00 <NA>      NA    NA    NA
+    ##  8 2013. N829AS  EV      2013-01-01 06:00:00 <NA>      NA    NA    NA
+    ##  9 2013. N593JB  B6      2013-01-01 06:00:00 <NA>      NA    NA    NA
+    ## 10 2013. N3ALAA  AA      2013-01-01 06:00:00 <NA>      NA    NA    NA
+    ## # ... with 27,105 more rows, and 9 more variables: temp <dbl>, dewp <dbl>,
+    ## #   humid <dbl>, wind_dir <dbl>, wind_speed <dbl>, wind_gust <dbl>,
+    ## #   precip <dbl>, pressure <dbl>, visib <dbl>
+
+``` r
+# bind_cols(flights2, weather) different number of rows
+```
+
 ### 3. Let's create a tibble `p` with "x1" and "x2" coulmns and have duplicated element in "x1" column. Create another tibble `q` with "x1" and "x3" columns. Then apply `left_join` function `p` to `q` and `q` to `p`.
+
+``` r
+(p <- tibble(x1 = c("a", "b", "b", "c"), x2= 1:4))
+```
+
+    ## # A tibble: 4 x 2
+    ##   x1       x2
+    ##   <chr> <int>
+    ## 1 a         1
+    ## 2 b         2
+    ## 3 b         3
+    ## 4 c         4
+
+``` r
+(q <- tibble(x1 = c("a", "b", "c", "c"), x3= 5:8))
+```
+
+    ## # A tibble: 4 x 2
+    ##   x1       x3
+    ##   <chr> <int>
+    ## 1 a         5
+    ## 2 b         6
+    ## 3 c         7
+    ## 4 c         8
+
+``` r
+left_join(p, q)
+```
+
+    ## Joining, by = "x1"
+
+    ## # A tibble: 5 x 3
+    ##   x1       x2    x3
+    ##   <chr> <int> <int>
+    ## 1 a         1     5
+    ## 2 b         2     6
+    ## 3 b         3     6
+    ## 4 c         4     7
+    ## 5 c         4     8
+
+``` r
+left_join(q, p)
+```
+
+    ## Joining, by = "x1"
+
+    ## # A tibble: 5 x 3
+    ##   x1       x3    x2
+    ##   <chr> <int> <int>
+    ## 1 a         5     1
+    ## 2 b         6     2
+    ## 3 b         6     3
+    ## 4 c         7     4
+    ## 5 c         8     4

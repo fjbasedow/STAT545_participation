@@ -56,14 +56,14 @@ full_join(a,b, by="x1")
 ### what happen if we do not specify `by` option?
 
 ```{r}
-
+left_join(a,b) # automatically finds column to join by
 ```
 
 
 ### what happen if we join two different variables (e.g., "x1" to "x3") from two tibbles `a` to `b`?
 
 ```{r}
-
+# left_join(a, b, by =c("x1", "x3")) ?
 ```
 
 
@@ -233,9 +233,31 @@ Practice these concepts in the following exercises. It might help you to first i
 
 ### 1. Filter the rows of `flights2` by matching "year" and "time_hour" variables to `weather` dataset. Use both `semi_join()` and `anti_join()`
 
+```{r}
+semi_join(flights2, weather)
+anti_join(flights2, weather) # there is no mismatch
+```
 
 
 ### 2. Can we apply `set` and `binding` funcions between `flights2` and `weather` datasets. Why and why not?
 
+```{r}
+# union(flights2, weather) 
+
+bind_rows(flights2, weather)
+
+# bind_cols(flights2, weather) different number of rows
+```
+
 
 ### 3. Let's create a tibble `p` with "x1" and "x2" coulmns and have duplicated element in "x1" column. Create another tibble `q` with "x1" and "x3" columns. Then apply `left_join` function `p` to `q` and `q` to `p`. 
+
+```{r}
+(p <- tibble(x1 = c("a", "b", "b", "c"), x2= 1:4))
+
+(q <- tibble(x1 = c("a", "b", "c", "c"), x3= 5:8))
+
+left_join(p, q)
+left_join(q, p)
+```
+
