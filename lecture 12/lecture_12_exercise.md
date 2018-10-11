@@ -597,11 +597,11 @@ gap_big_north <- gapminder %>%
   filter(country %in% c("Canada", "United States", "Mexico")) %>% 
   droplevels()
 gap_big_north$country %>% 
-  fct_recode("USA" = "United States") %>% 
+  fct_recode("USA" = "United States", "Can" = "Canada") %>% 
   levels()
 ```
 
-    ## [1] "Canada" "Mexico" "USA"
+    ## [1] "Can"    "Mexico" "USA"
 
 Condensing a Factor
 -------------------
@@ -629,6 +629,38 @@ More practically, we can lump the least frequent levels together as "Other". Mod
 -   The bar chart shows the two least frequently observed continents (Hint: use negative `n`).
 -   You let `fct_lump()` decide on the number of non-other continents. How is this chosen?
 -   Note: you can manually specify non-other levels using `fct_other()`.
+
+``` r
+cont %>% 
+  fct_lump(2) %>% 
+  qplot()
+```
+
+![](lecture_12_exercise_files/figure-markdown_github/unnamed-chunk-27-1.png)
+
+``` r
+cont %>% 
+  fct_lump(-2) %>% 
+  qplot()
+```
+
+![](lecture_12_exercise_files/figure-markdown_github/unnamed-chunk-27-2.png)
+
+``` r
+cont %>% 
+  fct_lump() %>% 
+  qplot()
+```
+
+![](lecture_12_exercise_files/figure-markdown_github/unnamed-chunk-27-3.png)
+
+``` r
+cont %>% 
+  fct_other(keep = "Asia") %>% 
+  qplot()
+```
+
+![](lecture_12_exercise_files/figure-markdown_github/unnamed-chunk-27-4.png)
 
 We can use the `w` argument to lump by another variable.
 

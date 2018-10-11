@@ -293,7 +293,7 @@ gap_big_north <- gapminder %>%
   filter(country %in% c("Canada", "United States", "Mexico")) %>% 
   droplevels()
 gap_big_north$country %>% 
-  fct_recode("USA" = "United States") %>% 
+  fct_recode("USA" = "United States", "Can" = "Canada") %>% 
   levels()
 ```
 
@@ -322,7 +322,21 @@ More practically, we can lump the least frequent levels together as "Other". Mod
 - Note: you can manually specify non-other levels using `fct_other()`.
 
 ```{r, fig.width=2, fig.height=1}
+cont %>% 
+  fct_lump(2) %>% 
+  qplot()
 
+cont %>% 
+  fct_lump(-2) %>% 
+  qplot()
+
+cont %>% 
+  fct_lump() %>% 
+  qplot()
+
+cont %>% 
+  fct_other(keep = "Asia") %>% 
+  qplot()
 ```
 
 We can use the `w` argument to lump by another variable.
@@ -332,7 +346,7 @@ Exercise: Modify the following violin plot of life expectancies of African count
 1. There are 4 "violins" corresponding to countries with the highest lifeExp.
 2. There are 4 "violins" corresponding to countries with the highest gdpPercap
 
-```{r, fig.width=2, fig.height=1}
+```{r}
 gap_africa <- gapminder %>% 
     filter(continent == "Africa")
 gap_africa %>% 
