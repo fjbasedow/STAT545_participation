@@ -1,7 +1,7 @@
 cm012 Exercises: Factors
 ================
 
-`forcats` package comes loaded with `tiyverse`:
+`forcats` package comes loaded with `tidyverse`:
 
 ``` r
 suppressPackageStartupMessages(library(tidyverse))
@@ -261,3 +261,426 @@ set.seed(10)
     ##  [1] "b" "a" "b" "c" "a" "a" "a" "a" "b" "b"
 
 Convert `draw` to a factor. What are the levels? How many are there? How many of each category was drawn?
+
+``` r
+draw_fct <- as.factor(draw)
+levels(draw_fct)
+```
+
+    ## [1] "a" "b" "c"
+
+``` r
+nlevels((draw_fct))
+```
+
+    ## [1] 3
+
+Concatenating Factors
+---------------------
+
+We saw that `c()` doesn't work for concatenating. Modify the following code to use `fct_c()` from the `forcats` package:
+
+``` r
+c(lotr1$Film, lotr2$Film)
+```
+
+    ## [1] 1 1 1 1 1 1
+
+``` r
+fct_c(lotr1$Film, lotr2$Film)
+```
+
+    ## [1] The Fellowship Of The Ring The Fellowship Of The Ring
+    ## [3] The Fellowship Of The Ring The Return Of The King    
+    ## [5] The Return Of The King     The Return Of The King    
+    ## Levels: The Fellowship Of The Ring The Return Of The King
+
+Try binding by row `lotr1` and `lotr2`:
+
+-   with `rbind()`
+-   with `bind_rows()`
+
+Which one is more lenient? Which would you prefer?
+
+``` r
+rbind(lotr1, lotr2)
+```
+
+    ##                         Film   Race Female Male
+    ## 1 The Fellowship Of The Ring    Elf   1229  971
+    ## 2 The Fellowship Of The Ring Hobbit     14 3644
+    ## 3 The Fellowship Of The Ring    Man      0 1995
+    ## 4     The Return Of The King    Elf    183  510
+    ## 5     The Return Of The King Hobbit      2 2673
+    ## 6     The Return Of The King    Man    268 2459
+
+``` r
+bind_rows(lotr1, lotr2)
+```
+
+    ## Warning in bind_rows_(x, .id): Unequal factor levels: coercing to character
+
+    ## Warning in bind_rows_(x, .id): binding character and factor vector,
+    ## coercing into character vector
+
+    ## Warning in bind_rows_(x, .id): binding character and factor vector,
+    ## coercing into character vector
+
+    ##                         Film   Race Female Male
+    ## 1 The Fellowship Of The Ring    Elf   1229  971
+    ## 2 The Fellowship Of The Ring Hobbit     14 3644
+    ## 3 The Fellowship Of The Ring    Man      0 1995
+    ## 4     The Return Of The King    Elf    183  510
+    ## 5     The Return Of The King Hobbit      2 2673
+    ## 6     The Return Of The King    Man    268 2459
+
+Unused Levels
+-------------
+
+Levels don't always have to be present ("observed") in the factor. Example of what this means:
+
+``` r
+gap_gs <- gapminder %>% filter(country %in% c("Germany", "Sweden"))
+nlevels(gap_gs$country)
+```
+
+    ## [1] 142
+
+Sometimes keeping the levels is good. Other times, not.
+
+**Example of when it's good**:
+
+Here's the gapminder data down to rows where population is less than a quarter of a million, i.e. 250,000:
+
+``` r
+gap_small <- gapminder %>% 
+  filter(pop < 250000)
+```
+
+Exercise: Make a bar chart of the number of times a continent has a country with population &lt; 250,000 in the `gapminder` data set. Try with and without `scale_x_discrete(drop=FALSE)`.
+
+``` r
+(n_gap_small <- gap_small %>% 
+  group_by(country) %>% 
+  summarize(n = n()))
+```
+
+    ## # A tibble: 7 x 2
+    ##   country                   n
+    ##   <fct>                 <int>
+    ## 1 Bahrain                   5
+    ## 2 Comoros                   4
+    ## 3 Djibouti                  6
+    ## 4 Equatorial Guinea         4
+    ## 5 Iceland                   8
+    ## 6 Kuwait                    2
+    ## 7 Sao Tome and Principe    12
+
+``` r
+n_gap_small %>% 
+  ggplot(aes(country, n)) +
+  geom_bar(stat="identity")
+```
+
+![](lecture_12_exercise_files/figure-markdown_github/unnamed-chunk-12-1.png)
+
+``` r
+n_gap_small %>% 
+  ggplot(aes(country, n)) +
+  scale_x_discrete(drop=FALSE) +
+  geom_bar(stat="identity")
+```
+
+![](lecture_12_exercise_files/figure-markdown_github/unnamed-chunk-12-2.png)
+
+**Example of when it's bad**: If you ever use the `levels()` function.
+
+How to fix by dropping levels:
+
+-   Base R: `droplevels()` operates on either an entire data frame or a factor.
+-   `forcats::fct_drop()` only operates on a factor.
+
+Exercise: get rid of the unused factor levels for country and continent in different ways:
+
+-   `droplevels()`
+-   `fct_drop()` inside `mutate()`
+-   Re-defining the variable as a factor
+
+``` r
+gap_gs_drop <- droplevels(gap_gs)
+nlevels(gap_gs_drop$country)
+```
+
+    ## [1] 2
+
+``` r
+gap_gs %>% 
+  mutate(fct_country = fct_drop(country))
+```
+
+    ## # A tibble: 24 x 7
+    ##    country continent  year lifeExp      pop gdpPercap fct_country
+    ##    <fct>   <fct>     <int>   <dbl>    <int>     <dbl> <fct>      
+    ##  1 Germany Europe     1952    67.5 69145952     7144. Germany    
+    ##  2 Germany Europe     1957    69.1 71019069    10188. Germany    
+    ##  3 Germany Europe     1962    70.3 73739117    12902. Germany    
+    ##  4 Germany Europe     1967    70.8 76368453    14746. Germany    
+    ##  5 Germany Europe     1972    71.0 78717088    18016. Germany    
+    ##  6 Germany Europe     1977    72.5 78160773    20513. Germany    
+    ##  7 Germany Europe     1982    73.8 78335266    22032. Germany    
+    ##  8 Germany Europe     1987    74.8 77718298    24639. Germany    
+    ##  9 Germany Europe     1992    76.1 80597764    26505. Germany    
+    ## 10 Germany Europe     1997    77.3 82011073    27789. Germany    
+    ## # ... with 14 more rows
+
+Ordering
+--------
+
+Ordering of levels is alphabetical, by default. Usually not useful!
+
+``` r
+cont <- gapminder$continent
+levels(cont)
+```
+
+    ## [1] "Africa"   "Americas" "Asia"     "Europe"   "Oceania"
+
+Plotting happens in the order of the factor levels:
+
+``` r
+qplot(cont)
+```
+
+![](lecture_12_exercise_files/figure-markdown_github/unnamed-chunk-15-1.png)
+
+Much more effective to always consider a meaningful order when plotting a categorical variable. We'll look at three ways to re-order a factor.
+
+### Ordering with the factor itself
+
+Reorder by frequency:
+
+-   Rearrange by frequency: `fct_infreq()`.
+-   Reverse: `fct_rev()`
+
+``` r
+cont %>% 
+  fct_infreq() %>% 
+  qplot()
+```
+
+![](lecture_12_exercise_files/figure-markdown_github/unnamed-chunk-16-1.png)
+
+``` r
+cont %>% 
+  fct_rev() %>% 
+  qplot()
+```
+
+![](lecture_12_exercise_files/figure-markdown_github/unnamed-chunk-16-2.png)
+
+``` r
+cont %>% 
+  fct_inorder() %>% 
+  qplot()
+```
+
+![](lecture_12_exercise_files/figure-markdown_github/unnamed-chunk-16-3.png)
+
+Could also arrange by the order they appear in the factor with `fct_inorder()`.
+
+### Ordering by Another Variable
+
+Here are the 2007 life expectancies of Asian countries:
+
+``` r
+gap_asia_2007 <- gapminder %>% 
+  filter(year == 2007, continent == "Asia")
+ggplot(gap_asia_2007, aes(lifeExp, country)) + geom_point()
+```
+
+![](lecture_12_exercise_files/figure-markdown_github/unnamed-chunk-17-1.png)
+
+Let's use `fct_reorder()` to reorder the countries of `gap_asia_2007` by life Expectancy, and produce the same plot:
+
+``` r
+# fct_reorder(country, lifeExp, data = gap_asia_2007)
+```
+
+What about when life Expectancy is not unique? Example: life expectancy of each continent:
+
+``` r
+ggplot(gapminder, aes(continent, lifeExp)) +
+  geom_violin()
+```
+
+![](lecture_12_exercise_files/figure-markdown_github/unnamed-chunk-19-1.png)
+
+``` r
+ggplot(gapminder, aes(continent, lifeExp)) +
+  geom_boxplot()
+```
+
+![](lecture_12_exercise_files/figure-markdown_github/unnamed-chunk-19-2.png)
+
+`fct_reorder(f, x)` still works, but does some internal wrangling: a summary statistic (default: median) is computed on `x` for each category in the factor `f`.
+
+Exercise: Try making the above box plot and violin plots, ordered by median lifeExp. Try other functions to order by by modifying the `.fun` argument.
+
+What if we have two variables plus a non-positional categorical variable? Example: Life expectancy for some select countries. Want legend "ordered by life expectancy" -- but what does that mean?
+
+``` r
+select_countries <- c("Sweden", "Denmark", "Norway", "Germany", "Austria")
+gap_select <- gapminder %>% 
+  filter(country %in% select_countries) %>% 
+  droplevels()
+ggplot(gap_select, aes(year, lifeExp)) +
+  geom_line(aes(group=country, colour=country))
+```
+
+![](lecture_12_exercise_files/figure-markdown_github/unnamed-chunk-21-1.png)
+
+Use `fct_reorder2(f, x, y)` to reorder factor `f`:
+
+-   `.fun` is a function of `x` and `y`. Should return a single value, and is applied to each category.
+-   Default is `.fun = last2`, which looks at x-y plot for each category; uses the y-value furthest to the right.
+
+Exercise: Reorder the above line graph so that the legend is in order of last life expectancy. Useful for black-and-white printing!
+
+### Ordering "because I said so"
+
+Remember the plot of Asian life expectancies in 2007? What if you're preparing a report for the Syrian government? You'd want to put Syria first (for reasons external to the data).
+
+Here's how to use `fct_relevel()` to do that. Exercise: modify the code so that:
+
+-   in addition, Sweden goes second.
+-   instead of first, Syria goes after the third level. Hint: use `after=`.
+
+``` r
+gap_asia_2007$country %>% 
+  fct_relevel("Syria") %>% 
+  levels() %>% 
+  head()
+```
+
+    ## [1] "Syria"       "Afghanistan" "Albania"     "Algeria"     "Angola"     
+    ## [6] "Argentina"
+
+``` r
+gap_asia_2007$country %>% 
+  fct_relevel("Syria", "Sweden") %>% 
+  levels() %>% 
+  head()
+```
+
+    ## [1] "Syria"       "Sweden"      "Afghanistan" "Albania"     "Algeria"    
+    ## [6] "Angola"
+
+``` r
+gap_asia_2007$country %>% 
+  fct_relevel("Syria", after=3) %>% 
+  levels() %>% 
+  head()
+```
+
+    ## [1] "Afghanistan" "Albania"     "Algeria"     "Syria"       "Angola"     
+    ## [6] "Argentina"
+
+Re-coding a Factor
+------------------
+
+Want "United States" to read "USA" instead? Just use `fct_recode()`. (Sadly, no metaprogramming happens here).
+
+Exercise: modify the following code to also change "Canada" to read "Can". Hint: use a comma.
+
+``` r
+gap_big_north <- gapminder %>% 
+  filter(country %in% c("Canada", "United States", "Mexico")) %>% 
+  droplevels()
+gap_big_north$country %>% 
+  fct_recode("USA" = "United States") %>% 
+  levels()
+```
+
+    ## [1] "Canada" "Mexico" "USA"
+
+Condensing a Factor
+-------------------
+
+We can specify levels to combine. Let's look at the world in 2007:
+
+``` r
+gap_2007 <- gapminder %>% 
+  filter(year == 2007)
+```
+
+We can arbitrarily combine levels using `fct_collapse()`. For example, combine Europe and Asia into one factor called "combo":
+
+``` r
+cont %>% 
+  fct_collapse("combo" = c("Europe", "Asia")) %>% 
+  qplot()
+```
+
+![](lecture_12_exercise_files/figure-markdown_github/unnamed-chunk-26-1.png)
+
+More practically, we can lump the least frequent levels together as "Other". Modify the above code to use `fct_lump()` instead of `fct_collapse()` so that:
+
+-   The bar chart shows the two most frequently observed continents,
+-   The bar chart shows the two least frequently observed continents (Hint: use negative `n`).
+-   You let `fct_lump()` decide on the number of non-other continents. How is this chosen?
+-   Note: you can manually specify non-other levels using `fct_other()`.
+
+We can use the `w` argument to lump by another variable.
+
+Exercise: Modify the following violin plot of life expectancies of African countries, so that:
+
+1.  There are 4 "violins" corresponding to countries with the highest lifeExp.
+2.  There are 4 "violins" corresponding to countries with the highest gdpPercap
+
+``` r
+gap_africa <- gapminder %>% 
+    filter(continent == "Africa")
+gap_africa %>% 
+    mutate(country = fct_lump(country)) %>% 
+    ggplot(aes(country, lifeExp)) +
+    geom_violin()
+```
+
+![](lecture_12_exercise_files/figure-markdown_github/unnamed-chunk-28-1.png)
+
+Exercises
+---------
+
+Use the `gss_cat` data to answer the following questions (from <http://r4ds.had.co.nz/factors.html>).
+
+1.  (15.3.1 Ex. 1) Explore the distribution of rincome (reported income). What makes the default bar chart hard to understand? How could you improve the plot?
+
+2.  (15.3.2 Ex. 2) What is the most common relig in this survey? What’s the most common partyid?
+
+3.  (15.5.1 Ex. 1) How have the proportions of people identifying as Democrat, Republican, and Independent changed over time? Modify the following plot to a friendlier legend order.
+
+``` r
+gss_cat %>%
+  mutate(partyid = fct_collapse(partyid,
+    other = c("No answer", "Don't know", "Other party"),
+    rep = c("Strong republican", "Not str republican"),
+    ind = c("Ind,near rep", "Independent", "Ind,near dem"),
+    dem = c("Not str democrat", "Strong democrat")
+  )) %>% 
+  count(year, partyid) %>% 
+  ggplot(aes(year, n)) +
+  geom_line(aes(group=partyid, colour=partyid))
+```
+
+![](lecture_12_exercise_files/figure-markdown_github/unnamed-chunk-31-1.png)
+
+Dates and Times with Lubridate
+==============================
+
+Goal here: some exposure to `lubridate`; know it exists.
+
+1.  Use different combinations of y, m, d to make a date time object.
+
+2.  Get `year`, `month`, `yday`, `wday`, `day`.
+
+3.  Add durations (exact time spans) with `ddays`, `dweeks`, ... and periods (human-interpretable time spans) with `days`, `weeks`, and especially `months`.
