@@ -72,9 +72,11 @@ set.seed(10)
 Convert `draw` to a factor. What are the levels? How many are there? How many of each category was drawn?
 
 ```{r}
-draw_fct <- as.factor(draw)
+draw_fct <- factor(draw)
 levels(draw_fct)
-nlevels((draw_fct))
+levels(draw_fct) %>% is.factor()
+nlevels(draw_fct)
+fct_count(draw_fct)
 ```
 
 
@@ -96,7 +98,8 @@ Which one is more lenient? Which would you prefer?
 
 ```{r}
 rbind(lotr1, lotr2)
-bind_rows(lotr1, lotr2)
+bind_rows(lotr1, lotr2) %>% str()
+as.character(5)
 ```
 
 
@@ -107,6 +110,8 @@ Levels don't always have to be present ("observed") in the factor. Example of wh
 ```{r}
 gap_gs <- gapminder %>% filter(country %in% c("Germany", "Sweden"))
 nlevels(gap_gs$country)
+levels(gap_gs$country)
+as.character(gap_gs$country)
 ```
 
 
@@ -124,6 +129,7 @@ gap_small <- gapminder %>%
 Exercise: Make a bar chart of the number of times a continent has a country with population < 250,000 in the `gapminder` data set. Try with and without `scale_x_discrete(drop=FALSE)`.
 
 ```{r}
+# my solution
 (n_gap_small <- gap_small %>% 
   group_by(country) %>% 
   summarize(n = n()))
@@ -136,6 +142,14 @@ n_gap_small %>%
   ggplot(aes(country, n)) +
   scale_x_discrete(drop=FALSE) +
   geom_bar(stat="identity")
+
+# from the lecture:
+ggplot(gap_small, aes(continent)) +
+  geom_bar()
+
+ggplot(gap_small, aes(continent)) +
+  geom_bar() +
+  scale_x_discrete(drop = FALSE)
 ```
 
 __Example of when it's bad__: If you ever use the `levels()` function.
@@ -152,11 +166,21 @@ Exercise: get rid of the unused factor levels for country and continent in diffe
 - Re-defining the variable as a factor
 
 ```{r}
+# my solution
 gap_gs_drop <- droplevels(gap_gs)
 nlevels(gap_gs_drop$country)
 
 gap_gs %>% 
   mutate(fct_country = fct_drop(country))
+
+# from the lecture
+gap_small %>% 
+  droplevels() %>% # levels from $country and $continent are dropped
+  str()
+
+gap_small %>% 
+  mutate(continent = fct_drop(continent)) %>% # levels from $country aren't dropped, but are from $continent
+  str()
 ```
 
 
@@ -212,8 +236,12 @@ ggplot(gap_asia_2007, aes(lifeExp, country)) + geom_point()
 
 Let's use `fct_reorder()` to reorder the countries of `gap_asia_2007` by life Expectancy, and produce the same plot:
 
-```{r, fig.width=2, fig.height=1}
-# fct_reorder(country, lifeExp, data = gap_asia_2007)
+```{r}
+gap_asia_2007 %>% 
+  mutate(country = fct_reorder(country, lifeExp)) %>% 
+  ggplot(aes(lifeExp, country)) +
+  geom_point()
+
 ```
 
 What about when life Expectancy is not unique? Example: life expectancy of each continent:
@@ -229,8 +257,11 @@ ggplot(gapminder, aes(continent, lifeExp)) +
 
 Exercise: Try making the above box plot and violin plots, ordered by median lifeExp. Try other functions to order by by modifying the `.fun` argument.
 
-```{r, fig.width=2, fig.height=1}
-
+```{r}
+gapminder %>% 
+    mutate(continent = fct_reorder(continent, lifeExp)) %>% 
+    ggplot(aes(continent, lifeExp)) +
+    geom_boxplot()
 ```
 
 
@@ -252,8 +283,11 @@ Use `fct_reorder2(f, x, y)` to reorder factor `f`:
 
 Exercise: Reorder the above line graph so that the legend is in order of last life expectancy. Useful for black-and-white printing!
 
-```{r, fig.width=2, fig.height=1}
-
+```{r}
+gap_select %>% 
+    mutate(country = fct_reorder2(country, year, lifeExp)) %>% 
+    ggplot(aes(year, lifeExp)) +
+    geom_line(aes(colour=country))
 ```
 
 ### Ordering "because I said so"
@@ -383,6 +417,7 @@ gss_cat %>%
     dem = c("Not str democrat", "Strong democrat")
   )) %>% 
   count(year, partyid) %>% 
+   mutate(partyid = fct_reorder2(partyid, year, n)) %>%
   ggplot(aes(year, n)) +
   geom_line(aes(group=partyid, colour=partyid))
 ```
@@ -394,7 +429,8 @@ Goal here: some exposure to `lubridate`; know it exists.
 1. Use different combinations of y, m, d to make a date time object.
 
 ```{r}
-
+lubridate::ymd(170511)
+lubridate::ymd("2017-May-11")
 ```
 
 2. Get `year`, `month`, `yday`, `wday`, `day`.
