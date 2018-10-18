@@ -61,8 +61,10 @@ There are typically two goals of fitting a model:
 Model fitting methods tend to use a common format in R:
 
 ```
-method(formula, data, options)
+method(formula, data, options) # usually require tidy data 
 ```
+
+
 
 They also tend to have a common output: a special _list_. 
 
@@ -90,7 +92,11 @@ Exercise:
 2. On a new line, use the `unclass` function to uncover the object's true nature: a list. Note: it might be easier to use the `names` function to see what components are included in the list. 
 
 ```{r}
-(my_lm <- lm(FILL_THIS_IN, data=gapminder))
+(my_lm <- lm(lifeExp ~ log(gdpPercap), data=gapminder))
+
+unclass(my_lm)
+names(my_lm)
+my_lm$coefficients
 ```
 
 To complicate things further, some info is stored in _another_ list after applying the `summary` function:
@@ -103,7 +109,7 @@ summary(my_lm) %>%
 We can use the `predict()` function to make predictions from the model (default is to use fitting/training data). Here are the predictions:
 
 ```{r}
-predict(my_lm) %>% 
+predict(my_lm, newdata = tibble(gdpPercap = c(500, 600, 700))) %>% #predicts y values for x values i.e. predicting lifeExp for each log(gdpPercap) value, uses all of gapminder if newdata is not specified
   head()
 ```
 
@@ -131,5 +137,7 @@ Let's make it easier to extract info, using the `broom` package. There are three
 Exercise: apply all three functions to our fitted model, `my_lm`. What do you see?
 
 ```{r}
-
+tidy(my_lm)
+augment(my_lm) # can specifiy new data as with the predict function
+glance(my_lm)
 ```
